@@ -31,8 +31,7 @@ describe("Get API", () => {
       .get("/api/")
       .expect(200)
       .then((result) => {
-        let endPointKeys = Object.keys(endPoint);
-        expect(endPointKeys).toEqual(Object.keys(result.body));
+        expect(endPoint).toEqual(result.body);
         /*expect(result.body).toHaveProperty("GET /api", expect.any(Object));
         expect(result.body).toHaveProperty("GET /api/topics", expect.any(Object));
         expect(result.body).toHaveProperty("GET /api/articles", expect.any(Object));*/
