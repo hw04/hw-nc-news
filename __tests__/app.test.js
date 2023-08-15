@@ -18,6 +18,7 @@ describe("Get topics", () => {
         result.body.forEach((topic) => {
           expect(topic).toHaveProperty("slug", expect.any(String));
           expect(topic).toHaveProperty("description", expect.any(String));
+          expect(result.body).toHaveLength(3);
         });
       });
   });
