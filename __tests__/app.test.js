@@ -38,3 +38,38 @@ describe("Get API", () => {
       });
   });
 });
+
+describe("Get API", () => {
+  test("API request should return the object from endpoints.json", () => {
+    return request(app)
+      .get("/api/")
+      .expect(200)
+      .then((result) => {
+        expect(endPoint).toEqual(result.body);
+      });
+  });
+});
+
+describe("Get article by ID", () => {
+  test("A request for a particular id should return an article object with the correct properties", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((result) => {
+        expect(result.body).toHaveProperty("article_id", 1);
+        expect(result.body).toHaveProperty(
+          "title",
+          "Living in the shadow of a great man"
+        );
+      });
+  });
+  test("A request for a particular id should return an article object with the correct properties", () => {
+    return request(app)
+      .get("/api/articles/7")
+      .expect(200)
+      .then((result) => {
+        expect(result.body).toHaveProperty("article_id", 7);
+        expect(result.body).toHaveProperty("title", "Z");
+      });
+  });
+});
