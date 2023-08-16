@@ -1,4 +1,8 @@
-const { topicsModel, articleIdModel } = require("../models/model.js");
+const {
+  topicsModel,
+  articleIdModel,
+  getArticleList,
+} = require("../models/model.js");
 const endPoints = require("../endpoints.json");
 
 const topicsController = (request, response) => {
@@ -22,4 +26,19 @@ articleIdController = (request, response, next) => {
     });
 };
 
-module.exports = { topicsController, apiController, articleIdController };
+fetchArticleList = (request, response, next) => {
+  getArticleList()
+    .then((articles) => {
+      response.status(200).send(articles);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = {
+  topicsController,
+  apiController,
+  articleIdController,
+  fetchArticleList,
+};

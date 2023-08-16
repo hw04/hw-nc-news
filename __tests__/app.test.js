@@ -32,20 +32,6 @@ describe("Get API", () => {
       .expect(200)
       .then((result) => {
         expect(endPoint).toEqual(result.body);
-        /*expect(result.body).toHaveProperty("GET /api", expect.any(Object));
-        expect(result.body).toHaveProperty("GET /api/topics", expect.any(Object));
-        expect(result.body).toHaveProperty("GET /api/articles", expect.any(Object));*/
-      });
-  });
-});
-
-describe("Get API", () => {
-  test("API request should return the object from endpoints.json", () => {
-    return request(app)
-      .get("/api/")
-      .expect(200)
-      .then((result) => {
-        expect(endPoint).toEqual(result.body);
       });
   });
 });
@@ -80,7 +66,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/7")
       .expect(200)
       .then((result) => {
-        console.log(result.body);
         expect(result.body).toHaveProperty("article_id", 7);
         expect(result.body).toHaveProperty("title", "Z");
         expect(result.body).toHaveProperty("author", "icellusedkars");
@@ -108,6 +93,28 @@ describe("Get article by ID", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("404: Article doesn't exist");
+      });
+  });
+});
+
+describe("Get article list", () => {
+  test("It should return an array of article objects with the right properties", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.length).toBeGreaterThan(0);
+        result.body.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          // expect(article).toHaveProperty("comment_count");
+          expect(article).not.toHaveProperty("body");
+        });
       });
   });
 });

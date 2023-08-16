@@ -19,3 +19,13 @@ exports.articleIdModel = (article_id) => {
       return result.rows[0];
     });
 };
+
+exports.getArticleList = () => {
+  return db
+    .query(
+      "SELECT article_id, title, author, topic, created_at, votes, article_img_url FROM articles ORDER BY created_at DESC"
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
