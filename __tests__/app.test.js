@@ -80,7 +80,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/7")
       .expect(200)
       .then((result) => {
-        console.log(result.body);
         expect(result.body).toHaveProperty("article_id", 7);
         expect(result.body).toHaveProperty("title", "Z");
         expect(result.body).toHaveProperty("author", "icellusedkars");
@@ -99,7 +98,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/invalidID")
       .expect(400)
       .then(({ body }) => {
-        console.log(body.msg);
         expect(body.msg).toBe("400: ID invalid");
       });
   });
@@ -108,7 +106,49 @@ describe("Get article by ID", () => {
       .get("/api/articles/9999")
       .expect(404)
       .then(({ body }) => {
-        console.log(body.msg, "<< body.msg");
+        expect(body.msg).toBe("404: Article doesn't exist");
+      });
+  });
+});
+
+describe("Get comments by ID", () => {
+  test("200: The request should return an array of comments for the given ID", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((result) => {
+        expect(Array.isArray(result.body)).toBe(true);
+      });
+  });
+  test("200: The comment array should have the correct properties", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((result) => {
+        result.body.forEach((comment) => {
+          expect(comment).toHaveProperty("article_id", 1);
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+        });
+      });
+  });
+
+  test("400: Responds with an error message when passed an invalid ID", () => {
+    return request(app)
+      .get("/api/articles/invalidID")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: ID invalid");
+      });
+  });
+  test("404: Responds with an error message when passed a valid ID who's article doesn't exist", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(404)
+      .then(({ body }) => {
         expect(body.msg).toBe("404: Article doesn't exist");
       });
   });
