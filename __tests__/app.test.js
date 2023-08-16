@@ -70,6 +70,9 @@ describe("Get article by ID", () => {
           "article_img_url",
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
+        expect(result.body).toHaveProperty("topic", "mitch");
+        expect(result.body).toHaveProperty("votes", 100);
+        expect(result.body).toHaveProperty("created_at");
       });
   });
   test("A request for a particular id should return an article object with the correct properties", () => {
@@ -77,6 +80,7 @@ describe("Get article by ID", () => {
       .get("/api/articles/7")
       .expect(200)
       .then((result) => {
+        console.log(result.body);
         expect(result.body).toHaveProperty("article_id", 7);
         expect(result.body).toHaveProperty("title", "Z");
         expect(result.body).toHaveProperty("author", "icellusedkars");
@@ -85,6 +89,9 @@ describe("Get article by ID", () => {
           "article_img_url",
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
+        expect(result.body).toHaveProperty("topic", "mitch");
+        expect(result.body).toHaveProperty("votes", 0);
+        expect(result.body).toHaveProperty("created_at");
       });
   });
   test("400: Responds with an error message when passed an invalid ID", () => {
@@ -92,7 +99,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/invalidID")
       .expect(400)
       .then(({ body }) => {
-        console.log(body.msg);
         expect(body.msg).toBe("400: ID invalid");
       });
   });
@@ -101,7 +107,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/9999")
       .expect(404)
       .then(({ body }) => {
-        console.log(body.msg, "<< body.msg");
         expect(body.msg).toBe("404: Article doesn't exist");
       });
   });
