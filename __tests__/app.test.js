@@ -61,6 +61,15 @@ describe("Get article by ID", () => {
           "title",
           "Living in the shadow of a great man"
         );
+        expect(result.body).toHaveProperty("author", "butter_bridge");
+        expect(result.body).toHaveProperty(
+          "body",
+          "I find this existence challenging"
+        );
+        expect(result.body).toHaveProperty(
+          "article_img_url",
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
       });
   });
   test("A request for a particular id should return an article object with the correct properties", () => {
@@ -70,6 +79,30 @@ describe("Get article by ID", () => {
       .then((result) => {
         expect(result.body).toHaveProperty("article_id", 7);
         expect(result.body).toHaveProperty("title", "Z");
+        expect(result.body).toHaveProperty("author", "icellusedkars");
+        expect(result.body).toHaveProperty("body", "I was hungry.");
+        expect(result.body).toHaveProperty(
+          "article_img_url",
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
+      });
+  });
+  test("400: Responds with an error message when passed an invalid ID", () => {
+    return request(app)
+      .get("/api/articles/invalidID")
+      .expect(400)
+      .then(({ body }) => {
+        console.log(body.msg);
+        expect(body.msg).toBe("400: ID invalid");
+      });
+  });
+  test("404: Responds with an error message when passed a valid ID who's article doesn't exist", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(404)
+      .then(({ body }) => {
+        console.log(body.msg, "<< body.msg");
+        expect(body.msg).toBe("404: Article doesn't exist");
       });
   });
 });

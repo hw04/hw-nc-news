@@ -11,11 +11,15 @@ apiController = (request, response) => {
   response.status(200).send(endPoints);
 };
 
-articleIdController = (request, response) => {
+articleIdController = (request, response, next) => {
   const { article_id } = request.params;
-  articleIdModel(article_id).then((result) => {
-    response.status(200).send(result);
-  });
+  articleIdModel(article_id)
+    .then((result) => {
+      response.status(200).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports = { topicsController, apiController, articleIdController };
