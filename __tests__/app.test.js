@@ -99,6 +99,7 @@ describe("Get article by ID", () => {
       .get("/api/articles/invalidID")
       .expect(400)
       .then(({ body }) => {
+        console.log(body.msg);
         expect(body.msg).toBe("400: ID invalid");
       });
   });
@@ -107,6 +108,7 @@ describe("Get article by ID", () => {
       .get("/api/articles/9999")
       .expect(404)
       .then(({ body }) => {
+        console.log(body.msg, "<< body.msg");
         expect(body.msg).toBe("404: Article doesn't exist");
       });
   });
