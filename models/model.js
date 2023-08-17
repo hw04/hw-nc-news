@@ -30,3 +30,4 @@ exports.queryComments = (article_id) => {
       return result.rows;
     });
 };
+//

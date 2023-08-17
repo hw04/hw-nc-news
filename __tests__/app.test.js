@@ -32,20 +32,6 @@ describe("Get API", () => {
       .expect(200)
       .then((result) => {
         expect(endPoint).toEqual(result.body);
-        /*expect(result.body).toHaveProperty("GET /api", expect.any(Object));
-        expect(result.body).toHaveProperty("GET /api/topics", expect.any(Object));
-        expect(result.body).toHaveProperty("GET /api/articles", expect.any(Object));*/
-      });
-  });
-});
-
-describe("Get API", () => {
-  test("API request should return the object from endpoints.json", () => {
-    return request(app)
-      .get("/api/")
-      .expect(200)
-      .then((result) => {
-        expect(endPoint).toEqual(result.body);
       });
   });
 });

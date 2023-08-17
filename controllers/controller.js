@@ -2,6 +2,7 @@ const {
   topicsModel,
   articleIdModel,
   queryComments,
+  //
 } = require("../models/model.js");
 const endPoints = require("../endpoints.json");
 
