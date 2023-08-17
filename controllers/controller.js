@@ -1,7 +1,6 @@
 const {
   topicsModel,
   articleIdModel,
-  queryComments,
 } = require("../models/model.js");
 const endPoints = require("../endpoints.json");
 
@@ -26,20 +25,8 @@ articleIdController = (request, response, next) => {
     });
 };
 
-fetchComments = (request, response, next) => {
-  const { article_id } = request.params;
-  return Promise.all([articleIdModel(article_id), queryComments(article_id)])
-    .then((resolvedPromises) => {
-      response.status(200).send(resolvedPromises[1]);
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
-
 module.exports = {
   topicsController,
   apiController,
   articleIdController,
-  fetchComments,
 };
