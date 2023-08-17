@@ -28,9 +28,9 @@ articleIdController = (request, response, next) => {
 
 fetchComments = (request, response, next) => {
   const { article_id } = request.params;
-  queryComments(article_id)
-    .then((result) => {
-      response.status(200).send(result);
+  return Promise.all([articleIdModel(article_id), queryComments(article_id)])
+    .then((resolvedPromises) => {
+      response.status(200).send(resolvedPromises[1]);
     })
     .catch((err) => {
       next(err);
