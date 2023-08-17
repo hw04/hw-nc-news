@@ -27,12 +27,6 @@ exports.queryComments = (article_id) => {
       [article_id]
     )
     .then((result) => {
-      if (result.rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "404: Article doesn't exist",
-        });
-      }
       return result.rows;
     });
 };

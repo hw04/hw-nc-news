@@ -136,6 +136,15 @@ describe("Get comments by ID", () => {
       });
   });
 
+  test("200: Returns an empty array for an article with no comments", () => {
+    return request(app)
+      .get("/api/articles/7/comments")
+      .expect(200)
+      .then((result) => {
+        expect(result.body).toEqual([]);
+      });
+  });
+
   test("400: Responds with an error message when passed an invalid ID", () => {
     return request(app)
       .get("/api/articles/invalidID")
