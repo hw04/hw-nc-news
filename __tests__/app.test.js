@@ -32,20 +32,6 @@ describe("Get API", () => {
       .expect(200)
       .then((result) => {
         expect(endPoint).toEqual(result.body);
-        /*expect(result.body).toHaveProperty("GET /api", expect.any(Object));
-        expect(result.body).toHaveProperty("GET /api/topics", expect.any(Object));
-        expect(result.body).toHaveProperty("GET /api/articles", expect.any(Object));*/
-      });
-  });
-});
-
-describe("Get API", () => {
-  test("API request should return the object from endpoints.json", () => {
-    return request(app)
-      .get("/api/")
-      .expect(200)
-      .then((result) => {
-        expect(endPoint).toEqual(result.body);
       });
   });
 });
@@ -80,7 +66,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/7")
       .expect(200)
       .then((result) => {
-        console.log(result.body);
         expect(result.body).toHaveProperty("article_id", 7);
         expect(result.body).toHaveProperty("title", "Z");
         expect(result.body).toHaveProperty("author", "icellusedkars");
@@ -99,7 +84,6 @@ describe("Get article by ID", () => {
       .get("/api/articles/invalidID")
       .expect(400)
       .then(({ body }) => {
-        console.log(body.msg);
         expect(body.msg).toBe("400: ID invalid");
       });
   });
@@ -108,8 +92,86 @@ describe("Get article by ID", () => {
       .get("/api/articles/9999")
       .expect(404)
       .then(({ body }) => {
-        console.log(body.msg, "<< body.msg");
         expect(body.msg).toBe("404: Article doesn't exist");
+      });
+  });
+});
+
+describe("Post comment", () => {
+  test("201: Responds with the comment object that has been sent", () => {
+    const newComment = { username: "butter_bridge", body: "This is a comment" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment.body).toEqual("This is a comment");
+        expect(comment.author).toEqual("butter_bridge");
+        expect(comment.article_id).toEqual(1);
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("comment_id");
+      });
+  });
+  test("201: Ignores extra properties", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a comment",
+      fruit: "apple",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment.body).toEqual("This is a comment");
+        expect(comment.author).toEqual("butter_bridge");
+        expect(comment.article_id).toEqual(1);
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("comment_id");
+      });
+  });
+  test("400: Responds with an error message when passed a comment with an invalid ID", () => {
+    const newComment = { username: "butter_bridge", body: "This is a comment" };
+    return request(app)
+      .post("/api/articles/invalidID/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: ID invalid");
+      });
+  });
+  test("404: Responds with an error message when passed a comment with a valid ID but who's article doesn't exist", () => {
+    const newComment = { username: "butter_bridge", body: "This is a comment" };
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("404: Article doesn't exist");
+      });
+  });
+  test("400: Responds with an error message when passed an empty comment", () => {
+    const newComment = { username: "butter_bridge" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: Field cannot be empty!");
+      });
+  });
+  test("400: Responds with an error message when passed an invalid username", () => {
+    const newComment = { username: "user123", body: "ABC" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: Invalid username");
       });
   });
 });
