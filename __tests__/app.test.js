@@ -174,7 +174,7 @@ describe("Post comment", () => {
         expect(body.msg).toBe("400: Invalid username");
       });
   });
-});
+})
 
 describe("Patch an article", () => {
   test("200: Responds with the updated article", () => {
