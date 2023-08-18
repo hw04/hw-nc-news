@@ -175,3 +175,25 @@ describe("Post comment", () => {
       });
   });
 });
+
+describe("Delete a comment", () => {
+  test("204: Responds with a 204 code and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("404: Comment doesn't exist");
+      });
+  });
+  test("400: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: ID invalid");
+      });
+  });
+});

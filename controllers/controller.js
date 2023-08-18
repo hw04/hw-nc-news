@@ -2,6 +2,8 @@ const {
   topicsModel,
   articleIdModel,
   insertComment,
+  retrieveComment,
+  removeComment,
 } = require("../models/model.js");
 const endPoints = require("../endpoints.json");
 
@@ -33,7 +35,6 @@ addComment = (request, response, next) => {
     articleIdModel(article_id),
     insertComment(newComment, article_id),
   ])
-
     .then((resolvedPromises) => {
       response.status(201).send({ comment: resolvedPromises[1] });
     })
@@ -42,9 +43,21 @@ addComment = (request, response, next) => {
     });
 };
 
+deleteComment = (request, response, next) => {
+  const { comment_id } = request.params;
+  removeComment(comment_id)
+    .then((result) => {
+      console.log(result, "result");
+      response.status(204).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 module.exports = {
   topicsController,
   apiController,
   articleIdController,
   addComment,
+  deleteComment,
 };
