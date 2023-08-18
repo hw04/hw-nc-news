@@ -2,6 +2,8 @@ const express = require("express");
 const {
   topicsController,
   apiController,
+  fetchComments,
+  addComment,
 } = require("./controllers/controller");
 const {
   handle400Errors,
