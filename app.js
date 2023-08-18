@@ -3,13 +3,17 @@ const {
   topicsController,
   apiController,
   fetchComments,
-  //
+  addComment,
 } = require("./controllers/controller");
 const {
   handle400Errors,
   handleCustomErrors,
 } = require("./controllers/errors.controller");
 const app = express();
+
+app.use(express.json());
+
+app.post("/api/articles/:article_id/comments", addComment);
 
 app.get("/api/topics", topicsController);
 
@@ -22,7 +26,5 @@ app.get("/api/articles/:article_id/comments", fetchComments);
 app.use(handle400Errors);
 
 app.use(handleCustomErrors);
-
-// app.listen(9090, () => console.log("App listening on port 9090!"));
 
 module.exports = app;
