@@ -84,7 +84,7 @@ describe("Get article by ID", () => {
       .get("/api/articles/invalidID")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("400: ID invalid");
+        expect(body.msg).toBe("400: Bad request");
       });
   });
   test("404: Responds with an error message when passed a valid ID who's article doesn't exist", () => {
@@ -141,7 +141,7 @@ describe("Post comment", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("400: ID invalid");
+        expect(body.msg).toBe("400: Bad request");
       });
   });
   test("404: Responds with an error message when passed a comment with a valid ID but who's article doesn't exist", () => {
@@ -176,7 +176,7 @@ describe("Post comment", () => {
   });
 });
 
-describe.only("Patch an article", () => {
+describe("Patch an article", () => {
   test("200: Responds with the updated article", () => {
     const newUpdate = { inc_votes: 50 };
     return request(app)
@@ -201,7 +201,7 @@ describe.only("Patch an article", () => {
       });
   });
 
-  test.only("200: Works for negative votes", () => {
+  test("200: Works for negative votes", () => {
     const newUpdate = { inc_votes: -200 };
     return request(app)
       .patch("/api/articles/1/")
@@ -212,7 +212,6 @@ describe.only("Patch an article", () => {
         expect(article.votes).toBe(-100);
       });
   });
-
   test("400: Responds with an error message when passed an invalid ID", () => {
     const newUpdate = { inc_votes: 50 };
     return request(app)
@@ -220,7 +219,17 @@ describe.only("Patch an article", () => {
       .send(newUpdate)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("400: ID invalid");
+        expect(body.msg).toBe("400: Bad request");
+      });
+  });
+  test("400: Responds with an error message if inc_votes is not a number", () => {
+    const newUpdate = { inc_votes: "@" };
+    return request(app)
+      .patch("/api/articles/1/")
+      .send(newUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: Bad request");
       });
   });
   test("404: Responds with an error message when passed a valid ID but the article doesn't exist", () => {

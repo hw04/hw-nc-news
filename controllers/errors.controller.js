@@ -1,6 +1,6 @@
 const handle400Errors = (err, request, response, next) => {
   if (err.code === "22P02") {
-    response.status(400).send({ msg: "400: ID invalid" });
+    response.status(400).send({ msg: "400: Bad request" });
   } else if (err.code === "23503") {
     response.status(400).send({ msg: "400: Invalid username" });
   } else if (err.code === "23502") {
