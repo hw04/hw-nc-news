@@ -2,7 +2,6 @@ const express = require("express");
 const {
   topicsController,
   apiController,
-  addComment,
 } = require("./controllers/controller");
 const {
   handle400Errors,
@@ -19,6 +18,8 @@ app.get("/api/topics", topicsController);
 app.get("/api", apiController);
 
 app.get("/api/articles/:article_id", articleIdController);
+
+app.get("/api/articles/:article_id/comments", fetchComments);
 
 app.use(handle400Errors);
 
