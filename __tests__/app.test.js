@@ -175,3 +175,62 @@ describe("Post comment", () => {
       });
   });
 });
+
+describe.only("Patch an article", () => {
+  test("200: Responds with the updated article", () => {
+    const newUpdate = { inc_votes: 50 };
+    return request(app)
+      .patch("/api/articles/1/")
+      .send(newUpdate)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(150);
+      });
+  });
+
+  test("200: Returns the same article unaltered if inc_votes = 0", () => {
+    const newUpdate = { inc_votes: 0 };
+    return request(app)
+      .patch("/api/articles/1/")
+      .send(newUpdate)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(100);
+      });
+  });
+
+  test.only("200: Works for negative votes", () => {
+    const newUpdate = { inc_votes: -200 };
+    return request(app)
+      .patch("/api/articles/1/")
+      .send(newUpdate)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(-100);
+      });
+  });
+
+  test("400: Responds with an error message when passed an invalid ID", () => {
+    const newUpdate = { inc_votes: 50 };
+    return request(app)
+      .patch("/api/articles/invalidID/")
+      .send(newUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("400: ID invalid");
+      });
+  });
+  test("404: Responds with an error message when passed a valid ID but the article doesn't exist", () => {
+    const newUpdate = { inc_votes: 50 };
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(newUpdate)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("404: Article doesn't exist");
+      });
+  });
+});

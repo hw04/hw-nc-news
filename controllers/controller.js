@@ -2,6 +2,7 @@ const {
   topicsModel,
   articleIdModel,
   insertComment,
+  insertVotes,
 } = require("../models/model.js");
 const endPoints = require("../endpoints.json");
 
@@ -33,9 +34,23 @@ addComment = (request, response, next) => {
     articleIdModel(article_id),
     insertComment(newComment, article_id),
   ])
-
     .then((resolvedPromises) => {
       response.status(201).send({ comment: resolvedPromises[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+addVotes = (request, response, next) => {
+  const { article_id } = request.params;
+  const votes = request.body;
+  return Promise.all([
+    articleIdModel(article_id),
+    insertVotes(votes, article_id),
+  ])
+    .then((resolvedPromises) => {
+      response.status(200).send({ article: resolvedPromises[1] });
     })
     .catch((err) => {
       next(err);
@@ -47,4 +62,5 @@ module.exports = {
   apiController,
   articleIdController,
   addComment,
+  addVotes,
 };

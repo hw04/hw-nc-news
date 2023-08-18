@@ -3,6 +3,7 @@ const {
   topicsController,
   apiController,
   addComment,
+  addVotes,
 } = require("./controllers/controller");
 const {
   handle400Errors,
@@ -13,6 +14,8 @@ const app = express();
 app.use(express.json());
 
 app.post("/api/articles/:article_id/comments", addComment);
+
+app.patch("/api/articles/:article_id", addVotes);
 
 app.get("/api/topics", topicsController);
 
