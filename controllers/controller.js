@@ -3,6 +3,8 @@ const {
   articleIdModel,
   queryComments,
   insertComment,
+  retrieveComment,
+  removeComment,
   insertVotes,
 } = require("../models/model.js");
 const endPoints = require("../endpoints.json");
@@ -54,6 +56,12 @@ addComment = (request, response, next) => {
     });
 };
 
+deleteComment = (request, response, next) => {
+  const { comment_id } = request.params;
+  removeComment(comment_id)
+    .then((result) => {
+      response.status(204).send(result);
+
 addVotes = (request, response, next) => {
   const { article_id } = request.params;
   const votes = request.body;
@@ -75,5 +83,6 @@ module.exports = {
   articleIdController,
   fetchComments,
   addComment,
+  deleteComment,
   addVotes,
 };
