@@ -174,7 +174,7 @@ describe("Post comment", () => {
         expect(body.msg).toBe("400: Invalid username");
       });
   });
-})
+});
 
 describe("Patch an article", () => {
   test("200: Responds with the updated article", () => {
@@ -200,7 +200,6 @@ describe("Patch an article", () => {
         expect(article.votes).toBe(100);
       });
   });
-
   test("200: Works for negative votes", () => {
     const newUpdate = { inc_votes: -200 };
     return request(app)
@@ -240,7 +239,10 @@ describe("Patch an article", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("404: Article doesn't exist");
-=======
+      });
+  });
+});
+
 describe("Post comment", () => {
   test("201: Responds with the comment object that has been sent", () => {
     const newComment = { username: "butter_bridge", body: "This is a comment" };
@@ -285,7 +287,7 @@ describe("Post comment", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("400: ID invalid");
+        expect(body.msg).toBe("400: Bad request");
       });
   });
   test("404: Responds with an error message when passed a comment with a valid ID but who's article doesn't exist", () => {
@@ -318,3 +320,4 @@ describe("Post comment", () => {
         expect(body.msg).toBe("400: Invalid username");
       });
   });
+});
