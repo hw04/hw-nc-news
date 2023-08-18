@@ -3,7 +3,6 @@ const {
   articleIdModel,
   queryComments,
   insertComment,
-  retrieveComment,
   removeComment,
   insertVotes,
 } = require("../models/model.js");
@@ -61,6 +60,11 @@ deleteComment = (request, response, next) => {
   removeComment(comment_id)
     .then((result) => {
       response.status(204).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 addVotes = (request, response, next) => {
   const { article_id } = request.params;

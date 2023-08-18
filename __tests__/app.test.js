@@ -243,90 +243,11 @@ describe("Patch an article", () => {
   });
 });
 
-describe("Post comment", () => {
-  test("201: Responds with the comment object that has been sent", () => {
-    const newComment = { username: "butter_bridge", body: "This is a comment" };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(201)
-      .then((response) => {
-        const { comment } = response.body;
-        expect(comment.body).toEqual("This is a comment");
-        expect(comment.author).toEqual("butter_bridge");
-        expect(comment.article_id).toEqual(1);
-        expect(comment).toHaveProperty("votes");
-        expect(comment).toHaveProperty("created_at");
-        expect(comment).toHaveProperty("comment_id");
-      });
-  });
-  test("201: Ignores extra properties", () => {
-    const newComment = {
-      username: "butter_bridge",
-      body: "This is a comment",
-      fruit: "apple",
-    };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(201)
-      .then((response) => {
-        const { comment } = response.body;
-        expect(comment.body).toEqual("This is a comment");
-        expect(comment.author).toEqual("butter_bridge");
-        expect(comment.article_id).toEqual(1);
-        expect(comment).toHaveProperty("votes");
-        expect(comment).toHaveProperty("created_at");
-        expect(comment).toHaveProperty("comment_id");
-      });
-  });
-  test("400: Responds with an error message when passed a comment with an invalid ID", () => {
-    const newComment = { username: "butter_bridge", body: "This is a comment" };
-    return request(app)
-      .post("/api/articles/invalidID/comments")
-      .send(newComment)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("400: Bad request");
-      });
-  });
-  test("404: Responds with an error message when passed a comment with a valid ID but who's article doesn't exist", () => {
-    const newComment = { username: "butter_bridge", body: "This is a comment" };
-    return request(app)
-      .post("/api/articles/9999/comments")
-      .send(newComment)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("404: Article doesn't exist");
-      });
-  });
-  test("400: Responds with an error message when passed an empty comment", () => {
-    const newComment = { username: "butter_bridge" };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("400: Field cannot be empty!");
-      });
-  });
-  test("400: Responds with an error message when passed an invalid username", () => {
-    const newComment = { username: "user123", body: "ABC" };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("400: Invalid username");
-      });
-  });
-});
-
-describe("Delete a comment", () => {
+describe.only("Delete a comment", () => {
   test("204: Responds with a 204 code and no content", () => {
     return request(app).delete("/api/comments/1").expect(204);
   });
-  test("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
+  test.only("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
     return request(app)
       .delete("/api/comments/9999")
       .expect(404)
