@@ -20,6 +20,17 @@ exports.articleIdModel = (article_id) => {
     });
 };
 
+exports.queryComments = (article_id) => {
+  return db
+    .query(
+      "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;",
+      [article_id]
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
+
 exports.insertComment = (newComment, article_id) => {
   const { username, body } = newComment;
   return db
@@ -31,6 +42,7 @@ exports.insertComment = (newComment, article_id) => {
       return rows[0];
     });
 };
+
 
 exports.retrieveComment = (comment_id) => {
   return db
@@ -59,5 +71,16 @@ exports.removeComment = (comment_id) => {
         });
       }
       return result.rows[0];
+    });
+};
+
+exports.insertVotes = (votes, article_id) => {
+  return db
+    .query(
+      "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;",
+      [votes.inc_votes, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
     });
 };

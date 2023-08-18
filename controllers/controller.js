@@ -1,9 +1,11 @@
 const {
   topicsModel,
   articleIdModel,
+  queryComments,
   insertComment,
   retrieveComment,
   removeComment,
+  insertVotes,
 } = require("../models/model.js");
 const endPoints = require("../endpoints.json");
 
@@ -22,6 +24,17 @@ articleIdController = (request, response, next) => {
   articleIdModel(article_id)
     .then((result) => {
       response.status(200).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+fetchComments = (request, response, next) => {
+  const { article_id } = request.params;
+  return Promise.all([articleIdModel(article_id), queryComments(article_id)])
+    .then((resolvedPromises) => {
+      response.status(200).send(resolvedPromises[1]);
     })
     .catch((err) => {
       next(err);
@@ -48,15 +61,28 @@ deleteComment = (request, response, next) => {
   removeComment(comment_id)
     .then((result) => {
       response.status(204).send(result);
+
+addVotes = (request, response, next) => {
+  const { article_id } = request.params;
+  const votes = request.body;
+  return Promise.all([
+    articleIdModel(article_id),
+    insertVotes(votes, article_id),
+  ])
+    .then((resolvedPromises) => {
+      response.status(200).send({ article: resolvedPromises[1] });
     })
     .catch((err) => {
       next(err);
     });
 };
+
 module.exports = {
   topicsController,
   apiController,
   articleIdController,
+  fetchComments,
   addComment,
   deleteComment,
+  addVotes,
 };
