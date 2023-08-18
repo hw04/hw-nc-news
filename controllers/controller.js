@@ -45,7 +45,6 @@ addComment = (request, response, next) => {
     articleIdModel(article_id),
     insertComment(newComment, article_id),
   ])
-
     .then((resolvedPromises) => {
       response.status(201).send({ comment: resolvedPromises[1] });
     })
