@@ -47,7 +47,6 @@ deleteComment = (request, response, next) => {
   const { comment_id } = request.params;
   removeComment(comment_id)
     .then((result) => {
-      console.log(result, "result");
       response.status(204).send(result);
     })
     .catch((err) => {
