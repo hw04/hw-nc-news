@@ -2,7 +2,9 @@ const {
   topicsModel,
   articleIdModel,
   getArticleList,
+  insertComment,
 } = require("../models/model.js");
+
 const endPoints = require("../endpoints.json");
 
 const topicsController = (request, response) => {
@@ -26,10 +28,22 @@ articleIdController = (request, response, next) => {
     });
 };
 
+
 fetchArticleList = (request, response, next) => {
   getArticleList()
     .then((articles) => {
       response.status(200).send(articles);
+     })
+}
+addComment = (request, response, next) => {
+  const { article_id } = request.params;
+  const newComment = request.body;
+  return Promise.all([
+    articleIdModel(article_id),
+    insertComment(newComment, article_id),
+  ])
+    .then((resolvedPromises) => {
+      response.status(201).send({ comment: resolvedPromises[1] });
     })
     .catch((err) => {
       next(err);
@@ -41,4 +55,5 @@ module.exports = {
   apiController,
   articleIdController,
   fetchArticleList,
+  addComment,
 };
