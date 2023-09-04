@@ -136,7 +136,7 @@ describe("Get comments by ID", () => {
       .get("/api/articles/invalidID")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("400: ID invalid");
+        expect(body.msg).toBe("400: Bad request");
       });
   });
   test("404: Responds with an error message when passed a valid ID who's article doesn't exist", () => {
@@ -295,11 +295,11 @@ describe("Patch an article", () => {
   });
 });
 
-describe.only("Delete a comment", () => {
+describe("Delete a comment", () => {
   test("204: Responds with a 204 code and no content", () => {
     return request(app).delete("/api/comments/1").expect(204);
   });
-  test.only("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
+  test("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
     return request(app)
       .delete("/api/comments/9999")
       .expect(404)
@@ -312,7 +312,7 @@ describe.only("Delete a comment", () => {
       .delete("/api/comments/banana")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("400: ID invalid");
+        expect(body.msg).toBe("400: Bad request");
       });
   });
 });
