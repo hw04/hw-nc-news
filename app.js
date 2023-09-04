@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const {
   topicsController,
   apiController,
@@ -13,6 +14,8 @@ const {
   handle500Error,
 } = require("./controllers/errors.controller");
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
