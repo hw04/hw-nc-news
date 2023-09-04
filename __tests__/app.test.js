@@ -97,6 +97,35 @@ describe("Get article by ID", () => {
   });
 });
 
+describe("Get article list", () => {
+  test("It should return an array of article objects with the right properties", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.length).toBeGreaterThan(0);
+        result.body.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).not.toHaveProperty("body");
+        });
+      });
+  });
+  test("Default sort and order", () => {
+    return request(app)
+      .get("/api/articles")
+      .then((result) => {
+        expect(result.body).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
 describe("Get comments by ID", () => {
   test("200: The request should return an array of comments for the given ID", () => {
     return request(app)

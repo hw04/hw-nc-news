@@ -33,6 +33,8 @@ app.delete("/api/comments/:comment_id", deleteComment);
 
 app.get("/api/articles/:article_id/comments", fetchComments);
 
+app.get("/api/articles", fetchArticleList);
+
 app.use(handle400Errors);
 
 app.use(handleCustomErrors);

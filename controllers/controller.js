@@ -1,6 +1,7 @@
 const {
   topicsModel,
   articleIdModel,
+  getArticleList,
   queryComments,
   insertComment,
   removeComment,
@@ -27,6 +28,12 @@ articleIdController = (request, response, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+fetchArticleList = (request, response, next) => {
+  getArticleList().then((articles) => {
+    response.status(200).send(articles);
+  });
 };
 
 fetchComments = (request, response, next) => {
@@ -85,6 +92,7 @@ module.exports = {
   topicsController,
   apiController,
   articleIdController,
+  fetchArticleList,
   fetchComments,
   addComment,
   deleteComment,
