@@ -7,6 +7,7 @@ const {
   addComment,
   deleteComment,
   addVotes,
+  fetchArticleList,
 } = require("./controllers/controller");
 const {
   handle400Errors,
