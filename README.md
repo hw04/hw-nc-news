@@ -8,9 +8,8 @@ The backend is hosted [here](https://nc-news-czlb.onrender.com/api)
 
 ## Prerequisites
 
-Node.js and PostgreSQL must be installed in order to experiment with this project. The minimum versions are:
-
 Node: v18.11.15 or newer
+
 PostgreSQL: v14.8 or newer
 
 (Older versions may work but compatibility can't be guaranteed)
