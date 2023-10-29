@@ -7,6 +7,7 @@ const {
   removeComment,
   insertVotes,
 } = require("../models/model.js");
+
 const endPoints = require("../endpoints.json");
 
 const topicsController = (request, response) => {

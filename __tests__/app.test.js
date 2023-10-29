@@ -345,3 +345,27 @@ describe("Delete a comment", () => {
       });
   });
 });
+
+describe("Get users", () => {
+  test("200: Responds with an array", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+      });
+  });
+  test("200: User objects have the correct properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.length).not.toBe(0);
+        body.forEach((user) => {
+          expect(user).toHaveProperty("username");
+          expect(user).toHaveProperty("name");
+          expect(user).toHaveProperty("avatar_url");
+        });
+      });
+  });
+});

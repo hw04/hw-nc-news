@@ -9,11 +9,15 @@ const {
   addVotes,
   fetchArticleList,
 } = require("./controllers/controller");
+
+const { fetchUsers } = require("./controllers/users-controllers");
+
 const {
   handle400Errors,
   handleCustomErrors,
   handle500Error,
 } = require("./controllers/errors.controller");
+
 const app = express();
 
 app.use(cors());
@@ -35,6 +39,8 @@ app.delete("/api/comments/:comment_id", deleteComment);
 app.get("/api/articles/:article_id/comments", fetchComments);
 
 app.get("/api/articles", fetchArticleList);
+
+app.get("/api/users", fetchUsers);
 
 app.use(handle400Errors);
 
