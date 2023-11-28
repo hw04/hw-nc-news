@@ -21,7 +21,7 @@ module.exports = [
     created_at: 1583025180000,
   },
   {
-    body: " I carry a log — yes. Is it funny to you? It is not to me.",
+    body: "I carry a log — yes. Is it funny to you? It is not to me.",
     votes: -100,
     author: "icellusedkars",
     article_id: 1,
