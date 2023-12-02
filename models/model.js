@@ -20,18 +20,35 @@ exports.articleIdModel = (article_id) => {
     });
 };
 
-exports.getArticleList = () => {
-  return db
-    .query(
-      `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
-       FROM articles
-       LEFT JOIN comments ON comments.article_id = articles.article_id
-       GROUP BY articles.article_id
-       ORDER BY articles.created_at DESC;`
-    )
-    .then((result) => {
-      return result.rows;
-    });
+exports.getArticleList = (topic) => {
+  if (topic) {
+    return db
+      .query(
+        `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
+      FROM articles 
+      LEFT JOIN comments ON comments.article_id = articles.article_id
+      WHERE topic = $1
+      GROUP BY articles.article_id
+      ORDER BY articles.created_at DESC;
+      `,
+        [topic]
+      )
+      .then((result) => {
+        return result.rows;
+      });
+  } else {
+    return db
+      .query(
+        `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
+      FROM articles
+      LEFT JOIN comments ON comments.article_id = articles.article_id
+      GROUP BY articles.article_id
+      ORDER BY articles.created_at DESC;`
+      )
+      .then((result) => {
+        return result.rows;
+      });
+  }
 };
 
 exports.queryComments = (article_id) => {
