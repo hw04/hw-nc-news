@@ -43,10 +43,9 @@ app.patch("/api/articles/:article_id", patchVotes);
 // DELETE requests
 app.delete("/api/comments/:comment_id", deleteComment);
 
+// Error handling
 app.use(handle400Errors);
-
 app.use(handleCustomErrors);
-
 app.use(handle500Error);
 
 module.exports = app;
