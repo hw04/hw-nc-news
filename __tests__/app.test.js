@@ -269,7 +269,6 @@ describe("Patch an article", () => {
         expect(article.votes).toBe(150);
       });
   });
-
   test("200: Returns the same article unaltered if inc_votes = 0", () => {
     const newUpdate = { inc_votes: 0 };
     return request(app)
