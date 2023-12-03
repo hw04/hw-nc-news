@@ -1,28 +1,28 @@
 const {
-  topicsModel,
-  articleIdModel,
-  getArticleList,
+  queryTopics,
+  queryArticleById,
+  queryArticleList,
   queryComments,
   insertComment,
   removeComment,
   insertVotes,
-} = require("../models/model.js");
+} = require("../models/articles-models.js");
 
 const endPoints = require("../endpoints.json");
 
-const topicsController = (request, response) => {
-  topicsModel().then((result) => {
+exports.getTopics = (request, response) => {
+  queryTopics().then((result) => {
     response.status(200).send(result);
   });
 };
 
-apiController = (request, response) => {
+exports.getEndpoints = (request, response) => {
   response.status(200).send(endPoints);
 };
 
-articleIdController = (request, response, next) => {
+exports.getArticleById = (request, response, next) => {
   const { article_id } = request.params;
-  articleIdModel(article_id)
+  queryArticleById(article_id)
     .then((result) => {
       response.status(200).send(result);
     })
@@ -31,13 +31,14 @@ articleIdController = (request, response, next) => {
     });
 };
 
-fetchArticleList = (request, response, next) => {
-  getArticleList().then((articles) => {
+exports.getArticleList = (request, response, next) => {
+  const { topic } = request.query;
+  queryArticleList(topic).then((articles) => {
     response.status(200).send(articles);
   });
 };
 
-fetchComments = (request, response, next) => {
+exports.getArticleComments = (request, response, next) => {
   const { article_id } = request.params;
   return Promise.all([articleIdModel(article_id), queryComments(article_id)])
     .then((resolvedPromises) => {
@@ -48,7 +49,7 @@ fetchComments = (request, response, next) => {
     });
 };
 
-addComment = (request, response, next) => {
+exports.postComment = (request, response, next) => {
   const { article_id } = request.params;
   const newComment = request.body;
   return Promise.all([
@@ -63,7 +64,7 @@ addComment = (request, response, next) => {
     });
 };
 
-deleteComment = (request, response, next) => {
+exports.deleteComment = (request, response, next) => {
   const { comment_id } = request.params;
   removeComment(comment_id)
     .then((result) => {
@@ -74,7 +75,7 @@ deleteComment = (request, response, next) => {
     });
 };
 
-addVotes = (request, response, next) => {
+exports.patchVotes = (request, response, next) => {
   const { article_id } = request.params;
   const votes = request.body;
   return Promise.all([
@@ -87,15 +88,4 @@ addVotes = (request, response, next) => {
     .catch((err) => {
       next(err);
     });
-};
-
-module.exports = {
-  topicsController,
-  apiController,
-  articleIdController,
-  fetchArticleList,
-  fetchComments,
-  addComment,
-  deleteComment,
-  addVotes,
 };
