@@ -1,16 +1,20 @@
 const express = require("express");
 const cors = require("cors");
+const { getTopics } = require("./controllers/topics-controllers");
+
 const {
-  getTopics,
-  getEndpoints,
   getArticleById,
   getArticleList,
+  patchVotes,
+} = require("./controllers/articles-controllers");
+
+const {
   getArticleComments,
   postComment,
   deleteComment,
-  patchVotes,
-} = require("./controllers/controller");
+} = require("./controllers/comments-controllers");
 
+const { getEndpoints } = require("./controllers/api-controller");
 const { getUsers } = require("./controllers/users-controllers");
 
 const {
