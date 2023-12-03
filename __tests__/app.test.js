@@ -117,15 +117,40 @@ describe("Get article list", () => {
         });
       });
   });
-  test("Default sort and order", () => {
+  test("Returns articles with a default sort of date descending", () => {
     return request(app)
       .get("/api/articles")
+      .expect(200)
       .then((result) => {
         expect(result.body).toBeSortedBy("created_at", { descending: true });
       });
   });
+  test("200: Returns filtered articles when passed a valid topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.length).toBe(12);
+        result.body.forEach((article) => {
+          expect(article).toHaveProperty("topic", "mitch");
+        });
+      });
+  });
 });
-
+test("200: Returns an empty array when a valid topic query is passed but there are no articles with that topic", () => {
+  return request(app)
+    .get("/api/articles?topic=paper")
+    .expect(200)
+    .then((result) => {
+      expect(result.body.length).toBe(0);
+    });
+});
+test.only("404: Returns an appropriate error message when an invalid topic query is passed", () => {
+  return request(app)
+    .get("/api/articles?topic=randomtopicnothere")
+    .expect(404)
+    .then((result) => expect(result.body.msg).toBe("404: Topic doesn't exist"));
+});
 describe("Get comments by ID", () => {
   test("200: The request should return an array of comments for the given ID", () => {
     return request(app)

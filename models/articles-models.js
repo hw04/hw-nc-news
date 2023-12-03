@@ -21,10 +21,6 @@ exports.queryArticleById = (article_id) => {
     });
 };
 
-// SELECT *, COUNT(comments.comment_id) AS comment_count FROM articles
-// JOIN comments ON comments.article_id = articles.article_id
-// GROUP BY articles.article_id
-
 exports.queryArticles = (topic) => {
   if (topic) {
     return db
@@ -39,6 +35,12 @@ exports.queryArticles = (topic) => {
         [topic]
       )
       .then((result) => {
+        if (result.rows.length === 0) {
+          return Promise.reject({
+            status: 404,
+            msg: "404: Topic doesn't exist",
+          });
+        }
         return result.rows;
       });
   } else {

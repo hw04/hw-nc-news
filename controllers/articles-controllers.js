@@ -17,9 +17,13 @@ exports.getArticleById = (request, response, next) => {
 
 exports.getArticleList = (request, response, next) => {
   const { topic } = request.query;
-  queryArticles(topic).then((articles) => {
-    response.status(200).send(articles);
-  });
+  return Promise.all([queryArticles(topic)])
+    .then((articles) => {
+      response.status(200).send(articles);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.patchVotes = (request, response, next) => {
