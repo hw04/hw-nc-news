@@ -4,6 +4,8 @@ const {
   insertVotes,
 } = require("../models/articles-models.js");
 
+const { checkTopicExists } = require("../models/topics-models.js");
+
 exports.getArticleById = (request, response, next) => {
   const { article_id } = request.params;
   queryArticleById(article_id)
@@ -17,13 +19,23 @@ exports.getArticleById = (request, response, next) => {
 
 exports.getArticleList = (request, response, next) => {
   const { topic } = request.query;
-  return Promise.all([queryArticles(topic)])
-    .then((articles) => {
-      response.status(200).send(articles);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  if (topic) {
+    return Promise.all([checkTopicExists(topic), queryArticles(topic)])
+      .then((resolvedPromises) => {
+        response.status(200).send(resolvedPromises[1]);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } else {
+    queryArticles()
+      .then((result) => {
+        response.status(200).send(result);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
 };
 
 exports.patchVotes = (request, response, next) => {

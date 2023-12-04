@@ -22,40 +22,21 @@ exports.queryArticleById = (article_id) => {
 };
 
 exports.queryArticles = (topic) => {
-  if (topic) {
-    return db
-      .query(
-        `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
+  return db
+    .query(
+      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
       FROM articles 
       LEFT JOIN comments ON comments.article_id = articles.article_id
-      WHERE topic = $1
+      WHERE $1::VARCHAR IS NULL
+      OR topic = $1
       GROUP BY articles.article_id
       ORDER BY articles.created_at DESC;
       `,
-        [topic]
-      )
-      .then((result) => {
-        if (result.rows.length === 0) {
-          return Promise.reject({
-            status: 404,
-            msg: "404: Topic doesn't exist",
-          });
-        }
-        return result.rows;
-      });
-  } else {
-    return db
-      .query(
-        `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
-      FROM articles
-      LEFT JOIN comments ON comments.article_id = articles.article_id
-      GROUP BY articles.article_id
-      ORDER BY articles.created_at DESC;`
-      )
-      .then((result) => {
-        return result.rows;
-      });
-  }
+      [topic]
+    )
+    .then((result) => {
+      return result.rows;
+    });
 };
 
 exports.insertVotes = (votes, article_id) => {
