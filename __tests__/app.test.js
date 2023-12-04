@@ -156,6 +156,7 @@ describe("Model: Articles", () => {
               expect(result.body).toHaveProperty("topic", "mitch");
               expect(result.body).toHaveProperty("votes", 0);
               expect(result.body).toHaveProperty("created_at");
+              expect(result.body).toHaveProperty("comment_count");
             });
         });
         test("400: Responds with an error message when passed an invalid ID", () => {
