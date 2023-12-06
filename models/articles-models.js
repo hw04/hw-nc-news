@@ -21,17 +21,26 @@ exports.queryArticleById = (article_id) => {
     });
 };
 
-exports.queryArticles = (topic) => {
+exports.queryArticles = (topic, sort_by = "created_at", order_by = "DESC") => {
+  if (
+    !["title", "author", "created_at", "votes"].includes(sort_by.toLowerCase())
+  ) {
+    return Promise.reject({ status: 400, msg: "400: Invalid sort query" });
+  }
+
+  if (!["asc", "desc"].includes(order_by.toLowerCase())) {
+    return Promise.reject({ status: 400, msg: "400: Invalid order query" });
+  }
+
   return db
     .query(
       `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
-      FROM articles 
+      FROM articles
       LEFT JOIN comments ON comments.article_id = articles.article_id
       WHERE $1::VARCHAR IS NULL
       OR topic = $1
       GROUP BY articles.article_id
-      ORDER BY articles.created_at DESC;
-      `,
+      ORDER BY ${sort_by} ${order_by};`,
       [topic]
     )
     .then((result) => {
