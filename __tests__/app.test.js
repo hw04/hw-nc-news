@@ -38,9 +38,9 @@ describe("API", () => {
   describe("Route: /api/", () => {
     describe("Method: GET", () => {
       describe("200: Get endpoint list", () => {
-        test("The request should return the object from endpoints.json", () => {
+        test("200: Returns the object from endpoints.json", () => {
           return request(app)
-            .get("/api/")
+            .get("/api")
             .expect(200)
             .then(({ body }) => {
               expect(endPoint).toEqual(body);
