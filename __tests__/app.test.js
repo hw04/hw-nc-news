@@ -515,7 +515,7 @@ describe("Model: Users", () => {
               });
             });
         });
-        test.only("404: Responds with an error when a request is made for a user that doesn't exist", () => {
+        test("404: Responds with an error when a request is made for a user that doesn't exist", () => {
           return request(app)
             .get("/api/users/imnotauser")
             .expect(404)
