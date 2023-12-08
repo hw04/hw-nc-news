@@ -57,20 +57,25 @@
   },
   "POST /api/articles/:article_id/comments": {
     "description": "adds a comment to an article",
+    "body": {
+      "username": "grumpy19",
+      "body": "This morning, I showered for nine and a half minutes"
+    },
     "queries": [],
     "exampleResponse": {
       "comment": {
-        "comment_id": 301,
-        "body": "Postman test",
-        "article_id": 1,
+        "comment_id": 307,
+        "body": "This morning, I showered for nine and a half minutes",
+        "article_id": 2,
         "author": "grumpy19",
         "votes": 0,
-        "created_at": "2023-11-27T18:11:58.864Z"
+        "created_at": "2023-12-08T16:07:45.828Z"
       }
     }
   },
   "PATCH /api/articles/:article_id": {
     "description": "updates the votes on an article",
+    "body": { "inc_votes": 50 },
     "queries": ["votes"],
     "exampleResponse": {
       "article_id": 1,
@@ -123,5 +128,14 @@
         "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/4/4f/MR_JELLY_4A.jpg/revision/latest?cb=20180104121141"
       }
     ]
+  },
+  "GET /api/users/:username": {
+    "description": "returns information about an individual user, and an error if that user doesn't exist",
+    "queries": [],
+    "exampleResponse": {
+      "username": "grumpy19",
+      "name": "Paul Grump",
+      "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+    }
   }
 }
