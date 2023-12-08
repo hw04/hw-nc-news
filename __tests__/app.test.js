@@ -11,7 +11,6 @@ afterAll(() => {
 });
 
 // describe("", () => {});
-// { body }
 
 describe("Model: Topics", () => {
   describe("Route: /api/topics", () => {
@@ -475,7 +474,7 @@ describe("Model: Comments", () => {
 describe("Model: Users", () => {
   describe("Route: /api/users", () => {
     describe("Method: GET", () => {
-      describe("Get users", () => {
+      describe("Get user list", () => {
         test("200: Responds with an array", () => {
           return request(app)
             .get("/api/users")
@@ -495,6 +494,33 @@ describe("Model: Users", () => {
                 expect(user).toHaveProperty("name");
                 expect(user).toHaveProperty("avatar_url");
               });
+            });
+        });
+      });
+    });
+  });
+  describe("Route: /api/users/:username", () => {
+    describe("Method: GET", () => {
+      describe("Get individual user by id", () => {
+        test("200: Responds with a user object with the correct properties", () => {
+          return request(app)
+            .get("/api/users/lurker")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                username: "lurker",
+                name: "do_nothing",
+                avatar_url:
+                  "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+              });
+            });
+        });
+        test.only("404: Responds with an error when a request is made for a user that doesn't exist", () => {
+          return request(app)
+            .get("/api/users/imnotauser")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe("404: User doesn't exist");
             });
         });
       });
