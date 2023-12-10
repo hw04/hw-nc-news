@@ -2,17 +2,18 @@ const articlesRouter = require("express").Router();
 const {
   getArticleById,
   getArticleList,
-  patchVotes,
+  patchArticleVotes,
+  getArticleComments,
 } = require("../controllers/articles-controllers");
 
-const {
-  getArticleComments,
-  postComment,
-} = require("../controllers/comments-controllers");
+const { postComment } = require("../controllers/comments-controllers");
 
 articlesRouter.route("/").get(getArticleList);
 
-articlesRouter.route("/:article_id").get(getArticleById).patch(patchVotes);
+articlesRouter
+  .route("/:article_id")
+  .get(getArticleById)
+  .patch(patchArticleVotes);
 
 articlesRouter
   .route("/:article_id/comments")

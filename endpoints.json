@@ -1,13 +1,17 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves up a json representation of all the available endpoints of the api",
+    "queries": [],
+    "exampleResponse": "Everything you see here!",
+    "status": 200
   },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
       "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
+    },
+    "status": 200
   },
   "GET /api/articles": {
     "description": "serves an array of all articles",
@@ -24,7 +28,8 @@
           "comment_count": 6
         }
       ]
-    }
+    },
+    "status": 200
   },
   "GET /api/articles/:article_id": {
     "description": "serves an individual article object",
@@ -37,7 +42,24 @@
       "created_at": "2020-07-09T20:11:00.000Z",
       "votes": 100,
       "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-    }
+    },
+    "status": 200
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates the votes on an article",
+    "body": { "inc_votes": 50 },
+    "queries": ["votes"],
+    "exampleResponse": {
+      "article_id": 1,
+      "title": "Living in the shadow of a great man",
+      "topic": "mitch",
+      "author": "butter_bridge",
+      "body": "I find this existence challenging",
+      "created_at": "2020-07-09T20:11:00.000Z",
+      "votes": 150,
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+    },
+    "status": 200
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments associated with an article id",
@@ -53,7 +75,8 @@
           "article_id": 1
         }
       ]
-    }
+    },
+    "status": 200
   },
   "POST /api/articles/:article_id/comments": {
     "description": "adds a comment to an article",
@@ -70,28 +93,29 @@
         "author": "grumpy19",
         "votes": 0,
         "created_at": "2023-12-08T16:07:45.828Z"
-      }
-    }
-  },
-  "PATCH /api/articles/:article_id": {
-    "description": "updates the votes on an article",
-    "body": { "inc_votes": 50 },
-    "queries": ["votes"],
-    "exampleResponse": {
-      "article_id": 1,
-      "title": "Living in the shadow of a great man",
-      "topic": "mitch",
-      "author": "butter_bridge",
-      "body": "I find this existence challenging",
-      "created_at": "2020-07-09T20:11:00.000Z",
-      "votes": 150,
-      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      },
+      "status": 201
     }
   },
   "DELETE /api/comments/:comment_id": {
     "description": "deletes an individual comment by id",
     "queries": [],
-    "exampleResponse": {}
+    "exampleResponse": {},
+    "status": 204
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the votes on a comment",
+    "body": { "inc_votes": 1 },
+    "queries": [],
+    "exampleResponse": {
+      "body": "Fruit pastilles",
+      "votes": 1,
+      "author": "icellusedkars",
+      "article_id": 1,
+      "comment_id": 13,
+      "created_at": "2020-06-15T10:25:00.000Z"
+    },
+    "status": 200
   },
   "GET /api/users": {
     "description": "serves an array of user objects",
@@ -127,7 +151,8 @@
         "name": "Jess Jelly",
         "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/4/4f/MR_JELLY_4A.jpg/revision/latest?cb=20180104121141"
       }
-    ]
+    ],
+    "status": 200
   },
   "GET /api/users/:username": {
     "description": "returns information about an individual user, and an error if that user doesn't exist",
@@ -136,6 +161,7 @@
       "username": "grumpy19",
       "name": "Paul Grump",
       "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
-    }
+    },
+    "status": 200
   }
 }

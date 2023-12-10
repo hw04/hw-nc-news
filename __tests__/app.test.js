@@ -375,22 +375,32 @@ describe("Model: Articles", () => {
     });
     describe("Method: PATCH", () => {
       describe("Patch an article's votes", () => {
-        test("200: Responds with the updated article", () => {
-          const newUpdate = { inc_votes: 50 };
+        test("200: Updates article votes and responds with the updated article", () => {
+          const votesUpdate = { inc_votes: 50 };
           return request(app)
             .patch("/api/articles/1/")
-            .send(newUpdate)
+            .send(votesUpdate)
             .expect(200)
             .then((response) => {
               const { article } = response.body;
-              expect(article.votes).toBe(150);
+              expect(article).toEqual({
+                article_id: 1,
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 150,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              });
             });
         });
         test("200: Returns the same article unaltered if inc_votes = 0", () => {
-          const newUpdate = { inc_votes: 0 };
+          const votesUpdate = { inc_votes: 0 };
           return request(app)
             .patch("/api/articles/1/")
-            .send(newUpdate)
+            .send(votesUpdate)
             .expect(200)
             .then((response) => {
               const { article } = response.body;
@@ -398,41 +408,62 @@ describe("Model: Articles", () => {
             });
         });
         test("200: Works for negative votes", () => {
-          const newUpdate = { inc_votes: -200 };
+          const votesUpdate = { inc_votes: -200 };
           return request(app)
             .patch("/api/articles/1/")
-            .send(newUpdate)
+            .send(votesUpdate)
             .expect(200)
             .then((response) => {
               const { article } = response.body;
               expect(article.votes).toBe(-100);
             });
         });
+        test("200: Ignores extra properties on request body", () => {
+          const votesUpdate = { inc_votes: 1, fruit: "tomato" };
+          return request(app)
+            .patch("/api/articles/4")
+            .send(votesUpdate)
+            .expect(200)
+            .then((response) => {
+              const { article } = response.body;
+              expect(article).toEqual({
+                article_id: 4,
+                title: "Student SUES Mitch!",
+                topic: "mitch",
+                author: "rogersop",
+                body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+                created_at: "2020-05-06T01:14:00.000Z",
+                votes: 9001,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              });
+            });
+        });
         test("400: Responds with an error message when passed an invalid ID", () => {
-          const newUpdate = { inc_votes: 50 };
+          const votesUpdate = { inc_votes: 50 };
           return request(app)
             .patch("/api/articles/invalidID/")
-            .send(newUpdate)
+            .send(votesUpdate)
             .expect(400)
             .then(({ body }) => {
               expect(body.msg).toBe("400: Bad request");
             });
         });
         test("400: Responds with an error message if inc_votes is not a number", () => {
-          const newUpdate = { inc_votes: "@" };
+          const votesUpdate = { inc_votes: "@" };
           return request(app)
             .patch("/api/articles/1/")
-            .send(newUpdate)
+            .send(votesUpdate)
             .expect(400)
             .then(({ body }) => {
               expect(body.msg).toBe("400: Bad request");
             });
         });
         test("404: Responds with an error message when passed a valid ID but the article doesn't exist", () => {
-          const newUpdate = { inc_votes: 50 };
+          const votesUpdate = { inc_votes: 50 };
           return request(app)
             .patch("/api/articles/9999")
-            .send(newUpdate)
+            .send(votesUpdate)
             .expect(404)
             .then(({ body }) => {
               expect(body.msg).toBe("404: Article doesn't exist");
@@ -464,6 +495,101 @@ describe("Model: Comments", () => {
             .expect(400)
             .then(({ body }) => {
               expect(body.msg).toBe("400: Bad request");
+            });
+        });
+      });
+    });
+    describe("Method: PATCH", () => {
+      describe("Patch a comment's votes", () => {
+        test("200: Updates comment votes and responds with the updated comment", () => {
+          const votesUpdate = { inc_votes: 1 };
+          return request(app)
+            .patch("/api/comments/13")
+            .send(votesUpdate)
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                body: "Fruit pastilles",
+                votes: 1,
+                author: "icellusedkars",
+                article_id: 1,
+                comment_id: 13,
+                created_at: "2020-06-15T10:25:00.000Z",
+              });
+            });
+        });
+        test("200: Returns the same comment unaltered if inc_votes = 0", () => {
+          const votesUpdate = { inc_votes: 0 };
+          return request(app)
+            .patch("/api/comments/13/")
+            .send(votesUpdate)
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                body: "Fruit pastilles",
+                votes: 0,
+                author: "icellusedkars",
+                article_id: 1,
+                comment_id: 13,
+                created_at: "2020-06-15T10:25:00.000Z",
+              });
+            });
+        });
+        test("200: Works for negative votes", () => {
+          const votesUpdate = { inc_votes: -200 };
+          return request(app)
+            .patch("/api/comments/4")
+            .send(votesUpdate)
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.votes).toBe(-300);
+            });
+        });
+        test("200: Ignores extra properties on request body", () => {
+          const votesUpdate = { inc_votes: -200, fruit: "tomato" };
+          return request(app)
+            .patch("/api/comments/4")
+            .send(votesUpdate)
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual({
+                body: "I carry a log — yes. Is it funny to you? It is not to me.",
+                votes: -300,
+                author: "icellusedkars",
+                article_id: 1,
+                comment_id: 4,
+                created_at: "2020-02-23T12:01:00.000Z",
+              });
+            });
+        });
+        test("400: Responds with an error message when passed an invalid comment ID", () => {
+          const votesUpdate = { inc_votes: 50 };
+          return request(app)
+            .patch("/api/comments/olive/")
+            .send(votesUpdate)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
+            });
+        });
+        test("400: Responds with an error message if inc_votes is not a number", () => {
+          const votesUpdate = { inc_votes: "notanum" };
+          return request(app)
+            .patch("/api/comments/5/")
+            .send(votesUpdate)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
+            });
+        });
+        test("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
+          const votesUpdate = { inc_votes: 50 };
+          return request(app)
+            .patch("/api/comments/91919190")
+            .send(votesUpdate)
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe("404: Comment doesn't exist");
             });
         });
       });
