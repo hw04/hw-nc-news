@@ -11,6 +11,24 @@ afterAll(() => {
 });
 
 // describe("", () => {});
+// test("", () => {});
+
+describe("API", () => {
+  describe("Route: /api/", () => {
+    describe("Method: GET", () => {
+      describe("200: Get endpoint list", () => {
+        test("200: Returns the object from endpoints.json", () => {
+          return request(app)
+            .get("/api")
+            .expect(200)
+            .then(({ body }) => {
+              expect(endPoint).toEqual(body);
+            });
+        });
+      });
+    });
+  });
+});
 
 describe("Model: Topics", () => {
   describe("Route: /api/topics", () => {
@@ -26,23 +44,6 @@ describe("Model: Topics", () => {
                 expect(topic).toHaveProperty("description", expect.any(String));
               });
               expect(body).toHaveLength(3);
-            });
-        });
-      });
-    });
-  });
-});
-
-describe("API", () => {
-  describe("Route: /api/", () => {
-    describe("Method: GET", () => {
-      describe("200: Get endpoint list", () => {
-        test("200: Returns the object from endpoints.json", () => {
-          return request(app)
-            .get("/api")
-            .expect(200)
-            .then(({ body }) => {
-              expect(endPoint).toEqual(body);
             });
         });
       });
@@ -168,6 +169,169 @@ describe("Model: Articles", () => {
         });
       });
     });
+    describe("Method: POST", () => {
+      describe("Post a new article", () => {
+        test("201: Posts an article and responds with the newly added article", () => {
+          const newArticle = {
+            author: "icellusedkars",
+            title: "Original article title",
+            body: "Original article body",
+            topic: "mitch",
+            article_img_url:
+              "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) =>
+              expect(body).toEqual({
+                author: "icellusedkars",
+                title: "Original article title",
+                body: "Original article body",
+                topic: "mitch",
+                article_img_url:
+                  "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+                article_id: 14,
+                votes: 0,
+                created_at: expect.any(String),
+                comment_count: 0,
+              })
+            );
+        });
+        test("201: Ignores extra properties", () => {
+          const newArticle = {
+            author: "icellusedkars",
+            title: "Original article title",
+            body: "Original article body",
+            topic: "mitch",
+            article_img_url:
+              "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+            fruit: "kiwi",
+            style: "art deco",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) =>
+              expect(body).toEqual({
+                author: "icellusedkars",
+                title: "Original article title",
+                body: "Original article body",
+                topic: "mitch",
+                article_img_url:
+                  "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+                article_id: 14,
+                votes: 0,
+                created_at: expect.any(String),
+                comment_count: 0,
+              })
+            );
+        });
+        test("201: Uses a default image if a URL isn't provided", () => {
+          const newArticle = {
+            author: "icellusedkars",
+            title: "Original article title",
+            body: "Original article body",
+            topic: "mitch",
+            article_img_url: "",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) =>
+              expect(body).toEqual({
+                author: "icellusedkars",
+                title: "Original article title",
+                body: "Original article body",
+                topic: "mitch",
+                article_img_url:
+                  "https://www.nccpimandtip.gov.eg/uploads/newsImages/1549208279-default-news.png",
+                article_id: 14,
+                votes: 0,
+                created_at: expect.any(String),
+                comment_count: 0,
+              })
+            );
+        });
+        test("201: Uses a default image if an invalid URL is detected", () => {
+          const newArticle = {
+            author: "icellusedkars",
+            title: "Original article title",
+            body: "Original article body",
+            topic: "mitch",
+            article_img_url: "https://www.testurl.com/notanimage",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) =>
+              expect(body).toEqual({
+                author: "icellusedkars",
+                title: "Original article title",
+                body: "Original article body",
+                topic: "mitch",
+                article_img_url:
+                  "https://www.nccpimandtip.gov.eg/uploads/newsImages/1549208279-default-news.png",
+                article_id: 14,
+                votes: 0,
+                created_at: expect.any(String),
+                comment_count: 0,
+              })
+            );
+        });
+        test("400: Responds with an error message when passed an invalid author", () => {
+          const newArticle = {
+            author: "simplyinvalid",
+            title: "Not so original title",
+            body: "Not so original body",
+            topic: "mitch",
+            article_img_url:
+              "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Invalid author!");
+            });
+        });
+        test("400: Responds with an error message when passed an invalid topic", () => {
+          const newArticle = {
+            author: "butter_bridge",
+            title: "Silver is the new gold",
+            body: "Platinum",
+            topic: "materials",
+            article_img_url:
+              "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Invalid topic!");
+            });
+        });
+        test("400: Responds with an error message when body is missing information", () => {
+          const newArticle = {
+            author: "butter_bridge",
+            title: "Test",
+          };
+          return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
+            });
+        });
+      });
+    });
   });
   describe("Route: /api/articles/:article_id", () => {
     describe("Method: GET", () => {
@@ -177,45 +341,21 @@ describe("Model: Articles", () => {
             .get("/api/articles/1")
             .expect(200)
             .then(({ body }) => {
-              expect(body).toHaveProperty("article_id", 1);
-              expect(body).toHaveProperty(
-                "title",
-                "Living in the shadow of a great man"
-              );
-              expect(body).toHaveProperty("author", "butter_bridge");
-              expect(body).toHaveProperty(
-                "body",
-                "I find this existence challenging"
-              );
-              expect(body).toHaveProperty(
-                "article_img_url",
-                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-              );
-              expect(body).toHaveProperty("topic", "mitch");
-              expect(body).toHaveProperty("votes", 100);
-              expect(body).toHaveProperty("created_at");
+              expect(body).toEqual({
+                article_id: 1,
+                title: "Living in the shadow of a great man",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                topic: "mitch",
+                votes: 100,
+                created_at: "2020-07-09T20:11:00.000Z",
+                comment_count: 11,
+              });
             });
         });
-        test("A request for a particular id should return an article object with the correct properties", () => {
-          return request(app)
-            .get("/api/articles/7")
-            .expect(200)
-            .then(({ body }) => {
-              expect(body).toHaveProperty("article_id", 7);
-              expect(body).toHaveProperty("title", "Z");
-              expect(body).toHaveProperty("author", "icellusedkars");
-              expect(body).toHaveProperty("body", "I was hungry.");
-              expect(body).toHaveProperty(
-                "article_img_url",
-                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-              );
-              expect(body).toHaveProperty("topic", "mitch");
-              expect(body).toHaveProperty("votes", 0);
-              expect(body).toHaveProperty("created_at");
-              expect(body).toHaveProperty("comment_count");
-            });
-        });
-        test("400: Responds with an error message when passed an invalid ID", () => {
+        test("400: Responds with an error message when passed an invalid article ID", () => {
           return request(app)
             .get("/api/articles/invalidID")
             .expect(400)
@@ -223,7 +363,7 @@ describe("Model: Articles", () => {
               expect(body.msg).toBe("400: Bad request");
             });
         });
-        test("404: Responds with an error message when passed a valid ID who's article doesn't exist", () => {
+        test("404: Responds with an error message when passed a valid article ID but the article doesn't exist", () => {
           return request(app)
             .get("/api/articles/9999")
             .expect(404)
@@ -232,7 +372,7 @@ describe("Model: Articles", () => {
             });
         });
       });
-      describe("Get comments by ID", () => {
+      describe("Get comments by article ID", () => {
         test("200: The request should return an array of comments for a given article ID", () => {
           return request(app)
             .get("/api/articles/1/comments")
@@ -266,7 +406,7 @@ describe("Model: Articles", () => {
             });
         });
 
-        test("400: Responds with an error message when passed an invalid ID", () => {
+        test("400: Responds with an error message when passed an invalid article ID", () => {
           return request(app)
             .get("/api/articles/invalidID")
             .expect(400)
@@ -285,7 +425,7 @@ describe("Model: Articles", () => {
       });
     });
     describe("Method: POST", () => {
-      describe("Post comment", () => {
+      describe("Post a new comment", () => {
         test("201: Responds with the comment object that has been sent", () => {
           const newComment = {
             username: "butter_bridge",
@@ -325,7 +465,7 @@ describe("Model: Articles", () => {
               expect(comment).toHaveProperty("comment_id");
             });
         });
-        test("400: Responds with an error message when passed a comment with an invalid ID", () => {
+        test("400: Responds with an error message when passed an invalid article ID", () => {
           const newComment = {
             username: "butter_bridge",
             body: "This is a comment",
@@ -338,7 +478,7 @@ describe("Model: Articles", () => {
               expect(body.msg).toBe("400: Bad request");
             });
         });
-        test("404: Responds with an error message when passed a comment with a valid ID but who's article doesn't exist", () => {
+        test("404: Responds with an error message when passed a valid article ID but the article doesn't exist", () => {
           const newComment = {
             username: "butter_bridge",
             body: "This is a comment",
@@ -358,7 +498,7 @@ describe("Model: Articles", () => {
             .send(newComment)
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe("400: Field cannot be empty!");
+              expect(body.msg).toBe("400: Bad request");
             });
         });
         test("400: Responds with an error message when passed an invalid username", () => {
@@ -368,7 +508,7 @@ describe("Model: Articles", () => {
             .send(newComment)
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe("400: Invalid username");
+              expect(body.msg).toBe("400: Invalid username!");
             });
         });
       });
@@ -439,7 +579,7 @@ describe("Model: Articles", () => {
               });
             });
         });
-        test("400: Responds with an error message when passed an invalid ID", () => {
+        test("400: Responds with an error message when passed an invalid article ID", () => {
           const votesUpdate = { inc_votes: 50 };
           return request(app)
             .patch("/api/articles/invalidID/")
@@ -478,8 +618,19 @@ describe("Model: Comments", () => {
   describe("Route: /api/comments/:comment_id", () => {
     describe("Method: DELETE", () => {
       describe("Delete a comment", () => {
-        test("204: Responds with a 204 code and no content after deleting a comment", () => {
-          return request(app).delete("/api/comments/1").expect(204);
+        test("204: Deletes the comment and responds with a 204 code and no content afterwards", () => {
+          return request(app)
+            .delete("/api/comments/1")
+            .expect(204)
+            .then(({ body }) => {
+              expect(body.msg).toBe(undefined);
+              return request(app)
+                .get("/api/articles/9/comments")
+                .expect(200)
+                .then(({ body }) => {
+                  expect(body.length).toBe(1);
+                });
+            });
         });
         test("404: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
           return request(app)
@@ -489,7 +640,7 @@ describe("Model: Comments", () => {
               expect(body.msg).toBe("404: Comment doesn't exist");
             });
         });
-        test("400: Responds with an error message when passed a valid ID but the comment doesn't exist", () => {
+        test("400: Responds with an error message when passed an invalid comment ID", () => {
           return request(app)
             .delete("/api/comments/banana")
             .expect(400)

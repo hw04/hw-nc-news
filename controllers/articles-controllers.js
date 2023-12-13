@@ -3,6 +3,7 @@ const {
   queryArticles,
   updateArticleVotes,
   queryArticleComments,
+  insertArticle,
 } = require("../models/articles-models.js");
 
 const { checkTopicExists } = require("../models/topics-models.js");
@@ -65,6 +66,17 @@ exports.patchArticleVotes = (request, response, next) => {
   ])
     .then((resolvedPromises) => {
       response.status(200).send({ article: resolvedPromises[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postArticle = (request, response, next) => {
+  const newArticle = request.body;
+  insertArticle(newArticle)
+    .then((result) => {
+      response.status(201).send(result);
     })
     .catch((err) => {
       next(err);

@@ -3,7 +3,7 @@ const db = require("../db/connection");
 exports.queryArticleById = (article_id) => {
   return db
     .query(
-      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.body, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
+      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.body, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments)::INT AS comment_count
       FROM articles 
       LEFT JOIN comments ON comments.article_id = articles.article_id
       WHERE articles.article_id = $1
@@ -66,6 +66,26 @@ exports.updateArticleVotes = (votes, article_id) => {
       [votes.inc_votes, article_id]
     )
     .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+exports.insertArticle = (newArticle) => {
+  const { author, title, body, topic } = newArticle;
+  let { article_img_url } = newArticle;
+  const reg = /\.(jpe?g|png|webp|gif)/;
+  if (!article_img_url || !reg.test(article_img_url)) {
+    article_img_url =
+      "https://www.nccpimandtip.gov.eg/uploads/newsImages/1549208279-default-news.png";
+  }
+  return db
+    .query(
+      `INSERT INTO articles (author, title, body, topic, article_img_url) 
+      VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      rows[0].comment_count = 0;
       return rows[0];
     });
 };

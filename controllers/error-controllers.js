@@ -1,10 +1,14 @@
 const handle400Errors = (err, request, response, next) => {
-  if (err.code === "22P02") {
+  const { code, constraint } = err;
+  console.log(err);
+  if (code === "22P02" || code === "23502") {
     response.status(400).send({ msg: "400: Bad request" });
-  } else if (err.code === "23503") {
-    response.status(400).send({ msg: "400: Invalid username" });
-  } else if (err.code === "23502") {
-    response.status(400).send({ msg: "400: Field cannot be empty!" });
+  } else if (code === "23503" && constraint === "comments_author_fkey") {
+    response.status(400).send({ msg: "400: Invalid username!" });
+  } else if (code === "23503" && constraint === "articles_author_fkey") {
+    response.status(400).send({ msg: "400: Invalid author!" });
+  } else if (code === "23503" && constraint === "articles_topic_fkey") {
+    response.status(400).send({ msg: "400: Invalid topic!" });
   } else {
     next(err);
   }
@@ -19,7 +23,6 @@ const handleCustomErrors = (err, request, response, next) => {
 };
 
 const handle500Error = (err, request, response, next) => {
-  console.log(err);
   response.status(500).send({ msg: "Internal server error" });
 };
 
