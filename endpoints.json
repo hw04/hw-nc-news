@@ -31,6 +31,28 @@
     },
     "status": 200
   },
+  "POST /api/articles": {
+    "description": "posts a new article and responds with the newly created article",
+    "body": {
+      "author": "icellusedkars",
+      "title": "Taking control",
+      "body": "Post post post",
+      "topic": "paper",
+      "article_img_url": "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg"
+    },
+    "queries": [],
+    "exampleResponse": {
+      "author": "icellusedkars",
+      "title": "Taking control",
+      "body": "Post post post",
+      "topic": "paper",
+      "article_img_url": "https://st2.depositphotos.com/3259079/5279/v/450/depositphotos_52796051-stock-illustration-the-original-rubber-stamp-red.jpg",
+      "article_id": 14,
+      "votes": 0,
+      "created_at": "2023-12-13T17:50:55.871Z",
+      "comment_count": 0
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an individual article object",
     "queries": [],
