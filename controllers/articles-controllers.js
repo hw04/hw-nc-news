@@ -34,11 +34,11 @@ exports.getArticleById = (request, response, next) => {
 };
 
 exports.getArticleList = (request, response, next) => {
-  const { topic, sort_by, order_by } = request.query;
+  const { topic, sort_by, order_by, limit, p } = request.query;
   if (topic) {
     return Promise.all([
       checkTopicExists(topic),
-      queryArticles(topic, sort_by, order_by),
+      queryArticles(topic, sort_by, order_by, limit, p),
     ])
       .then((resolvedPromises) => {
         response.status(200).send(resolvedPromises[1]);
@@ -47,7 +47,7 @@ exports.getArticleList = (request, response, next) => {
         next(err);
       });
   } else {
-    queryArticles(null, sort_by, order_by)
+    queryArticles(null, sort_by, order_by, limit, p)
       .then((result) => {
         response.status(200).send(result);
       })

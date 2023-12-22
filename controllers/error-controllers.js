@@ -1,6 +1,5 @@
 const handle400Errors = (err, request, response, next) => {
   const { code, constraint } = err;
-  console.log(err);
   if (code === "22P02" || code === "23502") {
     response.status(400).send({ msg: "400: Bad request" });
   } else if (code === "23503" && constraint === "comments_author_fkey") {

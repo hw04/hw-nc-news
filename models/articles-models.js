@@ -21,7 +21,17 @@ exports.queryArticleById = (article_id) => {
     });
 };
 
-exports.queryArticles = (topic, sort_by = "created_at", order_by = "DESC") => {
+exports.queryArticles = (
+  topic,
+  sort_by = "created_at",
+  order_by = "DESC",
+  limit,
+  p
+) => {
+  let queryValues = [];
+  let offset = 0;
+  let articleListQuery = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id)::INT AS comment_count`;
+
   if (
     !["title", "author", "created_at", "votes"].includes(sort_by.toLowerCase())
   ) {
@@ -32,20 +42,63 @@ exports.queryArticles = (topic, sort_by = "created_at", order_by = "DESC") => {
     return Promise.reject({ status: 400, msg: "400: Invalid order query" });
   }
 
-  return db
-    .query(
-      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count
-      FROM articles
-      LEFT JOIN comments ON comments.article_id = articles.article_id
-      WHERE $1::VARCHAR IS NULL
-      OR topic = $1
-      GROUP BY articles.article_id
-      ORDER BY ${sort_by} ${order_by};`,
-      [topic]
-    )
-    .then((result) => {
-      return result.rows;
-    });
+  if (p <= 0) {
+    return Promise.reject({ status: 400, msg: "400: Bad request" });
+  }
+
+  if (p && !limit) {
+    limit = 10;
+    offset = p;
+  }
+
+  if (limit) {
+    if (!p) {
+      p = 1;
+    }
+    offset = (p - 1) * limit;
+    articleListQuery += `, count(*) OVER()::INT as total_count`;
+  }
+
+  articleListQuery += ` FROM articles
+  LEFT JOIN comments ON comments.article_id = articles.article_id`;
+
+  if (topic) {
+    articleListQuery += ` WHERE topic = $1`;
+    queryValues.push(topic);
+  }
+
+  articleListQuery += ` GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order_by}`;
+
+  if (offset && limit) {
+    if (topic) {
+      articleListQuery += ` LIMIT $2 OFFSET $3;`;
+      queryValues.push(limit, offset);
+    } else {
+      articleListQuery += ` LIMIT $1 OFFSET $2;`;
+      queryValues.push(limit, offset);
+    }
+  } else if (limit && !offset) {
+    if (topic) {
+      articleListQuery += ` LIMIT $2;`;
+      queryValues.push(limit);
+    } else {
+      articleListQuery += ` LIMIT $1;`;
+      queryValues.push(limit);
+    }
+  } else if (offset && !limit) {
+    if (topic) {
+      articleListQuery += ` OFFSET $2;`;
+      queryValues.push(offset);
+    } else {
+      articleListQuery += ` OFFSET $1;`;
+      queryValues.push(offset);
+    }
+  }
+
+  return db.query(articleListQuery, queryValues).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.queryArticleComments = (article_id) => {

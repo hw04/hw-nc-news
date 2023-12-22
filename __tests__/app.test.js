@@ -60,7 +60,7 @@ describe("Model: Articles", () => {
             .get("/api/articles")
             .expect(200)
             .then(({ body }) => {
-              expect(body.length).toBeGreaterThan(0);
+              expect(body.length).toBe(13);
               body.forEach((article) => {
                 expect(article).toHaveProperty("author");
                 expect(article).toHaveProperty("title");
@@ -86,12 +86,12 @@ describe("Model: Articles", () => {
         });
         test("200: Returns filtered articles when passed a valid topic query", () => {
           return request(app)
-            .get("/api/articles?topic=mitch")
+            .get("/api/articles?topic=cats")
             .expect(200)
             .then(({ body }) => {
-              expect(body.length).toBe(12);
+              expect(body.length).toBe(1);
               body.forEach((article) => {
-                expect(article).toHaveProperty("topic", "mitch");
+                expect(article).toHaveProperty("topic", "cats");
               });
             });
         });
@@ -165,6 +165,135 @@ describe("Model: Articles", () => {
             .expect(400)
             .then(({ body }) => {
               expect(body.msg).toBe("400: Invalid order query");
+            });
+        });
+        test("200: Limits returned articles if limit query is present", () => {
+          return request(app)
+            .get("/api/articles?limit=10")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+              expect(body.length).toBe(10);
+              body.forEach((article) => {
+                expect(article).toHaveProperty("author");
+                expect(article).toHaveProperty("title");
+                expect(article).toHaveProperty("article_id");
+                expect(article).toHaveProperty("topic");
+                expect(article).toHaveProperty("created_at");
+                expect(article).toHaveProperty("votes");
+                expect(article).toHaveProperty("article_img_url");
+                expect(article).toHaveProperty("comment_count");
+                expect(article).not.toHaveProperty("body");
+              });
+            });
+        });
+        test("200: Returns all articles if limit query is greater than the total number of articles", () => {
+          return request(app)
+            .get("/api/articles?limit=60")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+              expect(body.length).toBe(13);
+              body.forEach((article) => {
+                expect(article).toHaveProperty("author");
+                expect(article).toHaveProperty("title");
+                expect(article).toHaveProperty("article_id");
+                expect(article).toHaveProperty("topic");
+                expect(article).toHaveProperty("created_at");
+                expect(article).toHaveProperty("votes");
+                expect(article).toHaveProperty("article_img_url");
+                expect(article).toHaveProperty("comment_count");
+                expect(article).not.toHaveProperty("body");
+              });
+            });
+        });
+        test("400: Responds with an error if limit query is invalid", () => {
+          return request(app)
+            .get("/api/articles?limit=bronze")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
+            });
+        });
+        test("200: Returns the correct page of results if p query is present", () => {
+          return request(app)
+            .get("/api/articles?limit=5&p=2")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+              expect(body.length).toBe(5);
+              body.forEach((article) => {
+                expect(article).toHaveProperty("author");
+                expect(article).toHaveProperty("title");
+                expect(article).toHaveProperty("article_id");
+                expect(article).toHaveProperty("topic");
+                expect(article).toHaveProperty("created_at");
+                expect(article).toHaveProperty("votes");
+                expect(article).toHaveProperty("article_img_url");
+                expect(article).toHaveProperty("comment_count");
+                expect(article).toHaveProperty("total_count");
+                expect(article).not.toHaveProperty("body");
+              });
+              expect(body[0]).toEqual({
+                article_id: 5,
+                title: "UNCOVERED: catspiracy to bring down democracy",
+                topic: "cats",
+                author: "rogersop",
+                created_at: "2020-08-03T13:14:00.000Z",
+                votes: 0,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                comment_count: 2,
+                total_count: 13,
+              });
+              expect(body[4]).toEqual({
+                article_id: 4,
+                title: "Student SUES Mitch!",
+                topic: "mitch",
+                author: "rogersop",
+                created_at: "2020-05-06T01:14:00.000Z",
+                votes: 9000,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                comment_count: 0,
+                total_count: 13,
+              });
+            });
+        });
+        test("200: Applies the default limit if one isn't provided and p query is present", () => {
+          return request(app)
+            .get("/api/articles?p=1")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.length).toBe(10);
+            })
+            .then(() => {
+              return request(app).get("/api/articles?p=2").expect(200);
+            })
+            .then(({ body }) => {
+              expect(body.length).toBe(3);
+            });
+        });
+        test("200: Returns an empty array if the page number is greater than the available pages", () => {
+          return request(app)
+            .get("/api/articles?p=12")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.length).toBe(0);
+            });
+        });
+        test("400: Responds with an error if p is less than 1", () => {
+          return request(app)
+            .get("/api/articles?limit=5&p=-1")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
             });
         });
       });
