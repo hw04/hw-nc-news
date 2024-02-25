@@ -501,57 +501,6 @@ describe("Model: Articles", () => {
             });
         });
       });
-      describe("Get comments by article ID", () => {
-        test("200: The request should return an array of comments for a given article ID", () => {
-          return request(app)
-            .get("/api/articles/1/comments")
-            .expect(200)
-            .then(({ body }) => {
-              expect(Array.isArray(body)).toBe(true);
-            });
-        });
-        test("200: The comment array should have the correct properties", () => {
-          return request(app)
-            .get("/api/articles/1/comments")
-            .expect(200)
-            .then(({ body }) => {
-              body.forEach((comment) => {
-                expect(comment).toHaveProperty("article_id", 1);
-                expect(comment).toHaveProperty("author");
-                expect(comment).toHaveProperty("body");
-                expect(comment).toHaveProperty("comment_id");
-                expect(comment).toHaveProperty("votes");
-                expect(comment).toHaveProperty("created_at");
-              });
-            });
-        });
-
-        test("200: Returns an empty array for an article with no comments", () => {
-          return request(app)
-            .get("/api/articles/7/comments")
-            .expect(200)
-            .then(({ body }) => {
-              expect(body).toEqual([]);
-            });
-        });
-
-        test("400: Responds with an error message when passed an invalid article ID", () => {
-          return request(app)
-            .get("/api/articles/invalidID")
-            .expect(400)
-            .then(({ body }) => {
-              expect(body.msg).toBe("400: Bad request");
-            });
-        });
-        test("404: Responds with an error message when passed a valid ID who's article doesn't exist", () => {
-          return request(app)
-            .get("/api/articles/9999")
-            .expect(404)
-            .then(({ body }) => {
-              expect(body.msg).toBe("404: Article doesn't exist");
-            });
-        });
-      });
     });
     describe("Method: POST", () => {
       describe("Post a new comment", () => {
@@ -736,6 +685,168 @@ describe("Model: Articles", () => {
             .expect(404)
             .then(({ body }) => {
               expect(body.msg).toBe("404: Article doesn't exist");
+            });
+        });
+      });
+    });
+  });
+  describe("Route: /api/articles/:article_id/comments", () => {
+    describe("Method: GET", () => {
+      describe("Get comments by article ID", () => {
+        test("200: Returns an array of comments for a given article ID, newest comments first", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+              expect(Array.isArray(body)).toBe(true);
+              expect(body.length).toBe(11);
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            });
+        });
+        test("200: Returns comments with the correct properties", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+              body.forEach((comment) => {
+                expect(comment).toHaveProperty("article_id", 1);
+                expect(comment).toHaveProperty("author");
+                expect(comment).toHaveProperty("body");
+                expect(comment).toHaveProperty("comment_id");
+                expect(comment).toHaveProperty("votes");
+                expect(comment).toHaveProperty("created_at");
+              });
+            });
+        });
+        test("200: Returns an empty array for an article with no comments", () => {
+          return request(app)
+            .get("/api/articles/7/comments")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toEqual([]);
+            });
+        });
+        test("400: Responds with an error message when passed an invalid article ID", () => {
+          return request(app)
+            .get("/api/articles/invalidID/comments")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
+            });
+        });
+        test("404: Responds with an error message when passed a valid article ID but the article doesn't exist", () => {
+          return request(app)
+            .get("/api/articles/9999/comments")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe("404: Article doesn't exist");
+            });
+        });
+        test("200: Limits returned comments if limit query is present", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=5")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+              expect(body.length).toBe(5);
+              body.forEach((comment) => {
+                expect(comment).toHaveProperty("article_id", 1);
+                expect(comment).toHaveProperty("author");
+                expect(comment).toHaveProperty("body");
+                expect(comment).toHaveProperty("comment_id");
+                expect(comment).toHaveProperty("votes");
+                expect(comment).toHaveProperty("created_at");
+              });
+            });
+        });
+        test("200: Returns all comments if limit query is greater than the total number of comments", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=50")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+              expect(body.length).toBe(11);
+              body.forEach((comment) => {
+                expect(comment).toHaveProperty("article_id", 1);
+                expect(comment).toHaveProperty("author");
+                expect(comment).toHaveProperty("body");
+                expect(comment).toHaveProperty("comment_id");
+                expect(comment).toHaveProperty("votes");
+                expect(comment).toHaveProperty("created_at");
+              });
+            });
+        });
+        test("400: Responds with an error if limit query is invalid", () => {
+          return request(app)
+            .get("/api/articles/3/comments?limit=silver")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
+            });
+        });
+        test("200: Returns the correct page of results if p query is present", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=5&p=2")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body).toBeSortedBy("created_at", {
+                descending: true,
+              });
+              expect(body.length).toBe(5);
+              body.forEach((comment) => {
+                expect(comment).toHaveProperty("article_id", 1);
+                expect(comment).toHaveProperty("author");
+                expect(comment).toHaveProperty("body");
+                expect(comment).toHaveProperty("comment_id");
+                expect(comment).toHaveProperty("votes");
+                expect(comment).toHaveProperty("created_at");
+              });
+              expect(body[0]).toEqual({
+                comment_id: 8,
+                body: "Delicious crackerbreads",
+                article_id: 1,
+                author: "icellusedkars",
+                votes: 0,
+                created_at: "2020-04-14T20:19:00.000Z",
+              });
+              expect(body[4]).toEqual({
+                comment_id: 4,
+                body: "I carry a log — yes. Is it funny to you? It is not to me.",
+                article_id: 1,
+                author: "icellusedkars",
+                votes: -100,
+                created_at: "2020-02-23T12:01:00.000Z",
+              });
+            });
+        });
+        test("200: Applies the default limit if one isn't provided and p query is present", () => {
+          return request(app)
+            .get("/api/articles/1/comments?p=1")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.length).toBe(10);
+            });
+        });
+        test("200: Returns an empty array if the page number is greater than the number of available pages", () => {
+          return request(app)
+            .get("/api/articles/4/comments?p=20")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.length).toBe(0);
+            });
+        });
+        test("400: Responds with an error if p is less than 1", () => {
+          return request(app)
+            .get("/api/articles/2/comments?limit=5&p=-1")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe("400: Bad request");
             });
         });
       });

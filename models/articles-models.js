@@ -48,7 +48,6 @@ exports.queryArticles = (
 
   if (p && !limit) {
     limit = 10;
-    offset = p;
   }
 
   if (limit) {
@@ -101,15 +100,42 @@ exports.queryArticles = (
   });
 };
 
-exports.queryArticleComments = (article_id) => {
-  return db
-    .query(
-      "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;",
-      [article_id]
-    )
-    .then((result) => {
-      return result.rows;
-    });
+exports.queryArticleComments = (article_id, limit, p) => {
+  let commentsQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`;
+  let queryValues = [article_id];
+  let offset = 0;
+
+  if (p <= 0) {
+    return Promise.reject({ status: 400, msg: "400: Bad request" });
+  }
+
+  if (p && !limit) {
+    limit = 10;
+  }
+
+  if (limit && !Number(limit)) {
+    return Promise.reject({ status: 400, msg: "400: Bad request" });
+  }
+
+  if (limit) {
+    if (!p) {
+      p = 1;
+    }
+    offset = (p - 1) * limit;
+  }
+
+  if (offset && limit) {
+    commentsQuery += ` LIMIT $2 OFFSET $3;`;
+    queryValues.push(limit, offset);
+  } else if (!offset && limit) {
+    commentsQuery += ` LIMIT $2;`;
+    queryValues.push(limit);
+  }
+
+  console.log(commentsQuery, queryValues);
+  return db.query(commentsQuery, queryValues).then((result) => {
+    return result.rows;
+  });
 };
 
 exports.updateArticleVotes = (votes, article_id) => {

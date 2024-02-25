@@ -9,10 +9,11 @@ const {
 const { checkTopicExists } = require("../models/topics-models.js");
 
 exports.getArticleComments = (request, response, next) => {
+  const { limit, p } = request.query;
   const { article_id } = request.params;
   return Promise.all([
     queryArticleById(article_id),
-    queryArticleComments(article_id),
+    queryArticleComments(article_id, limit, p),
   ])
     .then((resolvedPromises) => {
       response.status(200).send(resolvedPromises[1]);
